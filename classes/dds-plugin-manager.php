@@ -2,12 +2,20 @@
 
 class dds_plugin_manager {
 
-   // run when activating the plugin
-   function activate () {
+   private $db;
+
+   public function __construct () {
       global $wpdb;
 
+      $this->db = &$wpdb;
+
+   }
+
+   // run when activating the plugin
+   public function activate () {
+
       // create documents table if doesn't already exist
-      if ($wpdb->get_var ("SHOW TABLES LIKE '" . DDS_TABLE_DOCUMENTS . "'") != DDS_TABLE_DOCUMENTS) {
+      if ($this->db->get_var ("SHOW TABLES LIKE '" . DDS_TABLE_DOCUMENTS . "'") != DDS_TABLE_DOCUMENTS) {
 
          $sql = '
             CREATE TABLE    ' . DDS_TABLE_DOCUMENTS . '
@@ -20,18 +28,14 @@ class dds_plugin_manager {
             ,               date_updated    datetime        NOT NULL
             ,               UNIQUE KEY      id (id))
          ';
-         $wpdb->query ($sql);
-
-         //require_once (ABSPATH . 'wp-admin/includes/upgrade.php');
-         //dbDelta ($sql);
+         $this->db->query ($sql);
 
       }
 
    }
 
    // run when uninstalling the plugin
-   function uninstall () {
-      global $wpdb;
+   public function uninstall () {
 
       // delete all documents and storage folder
       // TODO: Fill in functionality
@@ -39,7 +43,7 @@ class dds_plugin_manager {
       // delete the documents table
       $sql = '
          DROP TABLE IF EXISTS ' . DDS_TABLE_DOCUMENTS;
-      $wpdb->query ($sql);
+      $this->db->query ($sql);
 
    }
 

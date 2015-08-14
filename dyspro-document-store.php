@@ -13,20 +13,11 @@ require_once (dirname (__FILE__) . '/config.php');
 
 // initialize objects
 $dds_plugin_manager = new dds_plugin_manager ();
+$dds_shortcode_manager = new dds_shortcode_manager ();
 
 // add installation script
 register_activation_hook (__FILE__, array ($dds_plugin_manager, 'activate'));
 register_uninstall_hook (__FILE__, array ($dds_plugin_manager, 'uninstall'));
 
 // set up shortcodes
-add_shortcode ('dds_file_store', 'dds_build_file_store_page');
-
-function dds_build_file_store_page ($attributes) {
-    $type = $attributes["type"];
-
-    global $wpdb;
-    $test = $wpdb->get_var ("SHOW TABLES LIKE '" . DDS_TABLE_DOCUMENTS . "'");
-
-    return "test: " . $test;
-
-}
+add_shortcode ('dds_file_store', array ($dds_shortcode_manager, 'build_file_store_page'));
