@@ -6,9 +6,7 @@ class dds_plugin_manager {
 
    public function __construct () {
       global $wpdb;
-
       $this->db = &$wpdb;
-
    }
 
    // run when activating the plugin

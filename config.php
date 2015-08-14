@@ -11,3 +11,4 @@ define ('DDS_TABLE_DOCUMENTS', $wpdb->prefix . 'dds_documents');
 // load support files
 require_once (DDS_BASE_PATH . '/classes/dds-plugin-manager.php');
 require_once (DDS_BASE_PATH . '/classes/dds-shortcode-manager.php');
+require_once (DDS_BASE_PATH . '/classes/dds-document-manager.php');
