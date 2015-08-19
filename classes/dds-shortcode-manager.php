@@ -64,6 +64,9 @@ class dds_shortcode_manager {
       $html .= '
 <div id="dds-form-add-edit" style="display: none;">
    <form class="dds-form" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="action" value=""/>
+      <input type="hidden" name="document_id" value=""/>
+      ' . wp_nonce_field('dds_add_edit', DDS_MANAGEMENT_NONCE, false, false) . '
       <div class="error-message"></div>
       <dl>
          <dt>Title</dt>
@@ -86,6 +89,7 @@ class dds_shortcode_manager {
    <form class="dds-form" method="post">
       <input type="hidden" name="action" value="delete"/>
       <input type="hidden" name="document_id" value=""/>
+      ' . wp_nonce_field('dds_delete', DDS_MANAGEMENT_NONCE, false, false) . '
       <p>Are you sure you want to delete [document_name]?  This will permanently delete the document from the system.</p>
       <p class="center">
          <button class="form-submit">Delete</button>

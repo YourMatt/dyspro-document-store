@@ -26,6 +26,7 @@ var ddsMain = {
          var container = $('.fancybox-wrap');
          $('.form-submit', container).click(ddsMain.saveModalHandler);
          $('.form-cancel', container).click(ddsMain.closeModalHandler);
+         $('input[name=action]', container).val('add');
          $('input[name=title]', container).focus();
 
       });
@@ -52,6 +53,7 @@ var ddsMain = {
          var container = $('.fancybox-wrap');
          $('.form-submit', container).click(ddsMain.saveModalHandler);
          $('.form-cancel', container).click(ddsMain.closeModalHandler);
+         $('input[name=action]', container).val('edit');
          $('input[name=document_id]', container).val(documentId);
          $('input[name=title]', container).val(documentTitle);
          $('textarea[name=description]', container).val(documentDescription);
