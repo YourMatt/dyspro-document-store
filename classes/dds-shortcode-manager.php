@@ -19,7 +19,7 @@ class dds_shortcode_manager {
       $documents = $dm->get_documents ($type);
 
       // return message if there are currently no document
-      if (! $documents) {
+      if (!$documents) {
          $html = '<p>There are currently no documents saved.</p>';
          return $html;
       }
@@ -29,9 +29,8 @@ class dds_shortcode_manager {
 
       // add the add document button
       $html .= '
-<div class="dds-add-document-wrapper">
-    <button class="dds-add-document">Add Document</button>
-</div>';
+<div class="dds-table-wrapper">
+<button class="dds-add-document">Add Document</button>';
 
       $html .= '
 <table id="dds-table" class="display" cellspacing="0" width="100%">
@@ -49,17 +48,42 @@ class dds_shortcode_manager {
       foreach ($documents as $document) {
          $html .= '
    <tr download="' . $document->file_path . '" document="' . $document->id . '">
-       <td><button class="dds-download-document">Download</button></a></td>
-       <td>' . $document->title . '</td>
-       <td>' . $document->description . '</td>
-       <td>' . $document->date_updated . '</td>
-       <td class="edit-controls"><button class="dds-edit-document">Edit</button><button class="dds-delete-document">Delete</button></td>
+      <td class="download-control"><button class="dds-download-document">Download</button></a></td>
+      <td class="title">' . $document->title . '</td>
+      <td class="description">' . $document->description . '</td>
+      <td class="date">' . $document->date_updated . '</td>
+      <td class="edit-controls"><button class="dds-edit-document">Edit</button><button class="dds-delete-document">Delete</button></td>
    </tr>';
       }
 
       $html .= '
 </tbody>
 </table>';
+
+      // add the add/edit form
+      $html .= '
+<div id="dds-form-add-edit" style="display: none;">
+   <div class="dds-form">
+      <p>This is the add/edit form.</p>
+   </div>
+</div>';
+
+      // add the delete form
+      $html .= '
+<div id="dds-form-delete" style="display: none;">
+   <form class="dds-form" method="post">
+      <input type="hidden" name="action" value="delete"/>
+      <input type="hidden" name="document_id" value=""/>
+      <p>Are you sure you want to delete [document_name]?  This will permanently delete the document from the system.</p>
+      <p class="center">
+         <button class="form-submit">Delete</button>
+         <button class="form-cancel">Cancel</button>
+      </p>
+   </form>
+</div>';
+
+      $html .= '
+</div>';
 
       return $html;
 
