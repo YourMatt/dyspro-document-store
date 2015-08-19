@@ -63,9 +63,21 @@ class dds_shortcode_manager {
       // add the add/edit form
       $html .= '
 <div id="dds-form-add-edit" style="display: none;">
-   <div class="dds-form">
-      <p>This is the add/edit form.</p>
-   </div>
+   <form class="dds-form" method="post" enctype="multipart/form-data">
+      <div class="error-message"></div>
+      <dl>
+         <dt>Title</dt>
+         <dd><input type="text" name="title" maxlength="255" value=""/></dd>
+         <dt>Description</dt>
+         <dd><textarea name="description"></textarea></dd>
+         <dt>File</dt>
+         <dd><input name="upload_file" type="file"/></dd>
+      </dl>
+      <p class="center">
+         <button class="form-submit">Save</button>
+         <button class="form-cancel">Cancel</button>
+      </p>
+   </form>
 </div>';
 
       // add the delete form
