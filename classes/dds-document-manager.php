@@ -43,6 +43,12 @@ class dds_document_manager {
          $base_document->local_path = $base_path . $base_document->file_name;
          $base_document->file_path = $base_web_path . $base_document->file_name;
 
+         // change the date to the local time zone
+         $base_document->date_updated = date (
+            'Y-m-d H:i',
+            strtotime ($base_document->date_updated) + 60 * 60 * get_option ('gmt_offset')
+         );
+
          // add the document to the list
          $document_data[] = $base_document;
 
@@ -75,6 +81,12 @@ class dds_document_manager {
       if (! file_exists (DDS_UPLOAD_BASE_PATH . '/' . $document_data->type . '/' . $document_data->file_name)) return [];
       $document_data->local_path = DDS_UPLOAD_BASE_PATH . '/' . $document_data->type . '/' . $document_data->file_name;
       $document_data->file_path = DDS_UPLOAD_WEB_PATH . '/' . $document_data->type . '/' . $document_data->file_name;
+
+      // change the date to the local time zone
+      $document_data->date_updated = date (
+         'Y-m-d H:i',
+         strtotime ($document_data->date_updated) + 60 * 60 * get_option ('gmt_offset')
+      );
 
       return $document_data;
 
