@@ -14,6 +14,7 @@ class dds_shortcode_manager {
 
    public function build_file_store_page ($attributes) {
       $type = $attributes["type"];
+      $is_admin = $attributes["admin"];
 
       $dm = new dds_document_manager ();
       $documents = $dm->get_documents ($type);
@@ -22,9 +23,12 @@ class dds_shortcode_manager {
       if (!$documents) {
          $html = '
 <div class="dds-empty-list-wrapper">
-    <p>There are currently no documents saved to this category.</p>
+    <p>There are currently no documents saved to this category.</p>';
+         if ($is_admin) {
+            $html .= '
     <button class="dds-add-document">Add Document</button>';
-         $html .= $this->get_add_edit_form ($type);
+            $html .= $this->get_add_edit_form($type);
+         }
          $html .= '
 </div>';
          return $html;
@@ -35,17 +39,18 @@ class dds_shortcode_manager {
 
       // add the add document button
       $html .= '
-<div class="dds-table-wrapper">
+<div class="dds-table-wrapper">';
+      if ($is_admin) $html .= '
 <button class="dds-add-document">Add Document</button>';
 
       // add the results table
-      $html .= $this->get_document_table ($documents);
+      $html .= $this->get_document_table ($documents, $is_admin);
 
-      // add the add/edit form
-      $html .= $this->get_add_edit_form ($type);
-
-      // add the delete form
-      $html .= $this->get_delete_form ();
+      // add management forms
+      if ($is_admin) {
+         $html .= $this->get_add_edit_form($type);
+         $html .= $this->get_delete_form();
+      }
 
       $html .= '
 </div>';
@@ -54,7 +59,7 @@ class dds_shortcode_manager {
 
    }
 
-   private function get_document_table ($documents) {
+   private function get_document_table ($documents, $is_admin) {
 
       $html = '
 <table id="dds-table" class="display" cellspacing="0" width="100%">
@@ -63,8 +68,12 @@ class dds_shortcode_manager {
       <th></th>
       <th>Title</th>
       <th>Description</th>
-      <th>Updated</th>
-      <th></th>
+      <th>Updated</th>';
+
+      if ($is_admin) $html .= '
+      <th></th>';
+
+      $html .= '
    </tr>
 </thead>
 <tbody>';
@@ -75,8 +84,12 @@ class dds_shortcode_manager {
       <td class="download-control"><button class="dds-download-document">Download</button></a></td>
       <td class="title">' . $document->title . '</td>
       <td class="description">' . $document->description . '</td>
-      <td class="date">' . $document->date_updated . '</td>
-      <td class="edit-controls"><button class="dds-edit-document">Edit</button><button class="dds-delete-document">Delete</button></td>
+      <td class="date">' . $document->date_updated . '</td>';
+
+         if ($is_admin) $html .= '
+      <td class="edit-controls"><button class="dds-edit-document">Edit</button><button class="dds-delete-document">Delete</button></td>';
+
+         $html .= '
    </tr>';
       }
 
