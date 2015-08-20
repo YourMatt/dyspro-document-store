@@ -104,7 +104,7 @@ var ddsMain = {
       var uploadFile = $('input[name=upload_file]', container).val();
 
       var errorMessage = '';
-      if (! uploadFile && editing) errorMessage = 'Please select a file to upload.';
+      if (! uploadFile && !editing) errorMessage = 'Please select a file to upload.';
       if (! description) errorMessage = 'Please enter a description to continue.';
       if (! title) errorMessage = 'Please enter a title to continue.';
 

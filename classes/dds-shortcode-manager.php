@@ -66,6 +66,7 @@ class dds_shortcode_manager {
    <form class="dds-form" method="post" enctype="multipart/form-data">
       <input type="hidden" name="action" value=""/>
       <input type="hidden" name="document_id" value=""/>
+      <input type="hidden" name="type" value="' . $type . '"/>
       ' . wp_nonce_field('dds_add_edit', DDS_MANAGEMENT_NONCE, false, false) . '
       <div class="error-message"></div>
       <dl>

@@ -3,6 +3,7 @@
 class dds_document_manager {
 
    public $updated_document_title;
+   public $error_message;
    private $db;
 
    public function __construct () {
@@ -79,11 +80,120 @@ class dds_document_manager {
 
    }
 
+   public function add_document ($title, $description, $type, $author, $file_reference) {
+      // file reference in format of: Array ( [name] => Capture.PNG [type] => image/png [tmp_name] => /tmp/phpeWcPTP [error] => 0 [size] => 18462 )
+
+      // validate required fields
+      if (!$title || !$description || !$type || !$author || !$file_reference['size']) {
+         $this->error_message = 'Missing required fields. Please try again.';
+         return false;
+      }
+
+      // validate that a file with the same name does not already exist and rename if it does
+      $target_path = DDS_UPLOAD_BASE_PATH . '/' . $type;
+      $target_name = $file_reference['name'];
+      $i = 1;
+      while (file_exists ($target_path . '/' . $target_name)) {
+         if (strpos ($target_name, '(' . ($i - 1) . ')') !== false) $target_name = str_replace ('(' . ($i - 1) . ')', '(' . $i . ')', $target_name);
+         else $target_name = str_replace ('.', '(' . $i . ').', $target_name);
+         if ($i > 100) { // break out if excessive looping
+            $this->error_message = 'The file name is already in use. Please change the file name and try again.';
+            return false;
+         }
+         $i++;
+      }
+
+      // move the file to the uploads folder
+      if (!move_uploaded_file ($file_reference['tmp_name'], $target_path . '/' . $target_name)) return false;
+
+      // insert the new record
+      if (! $this->db->insert (DDS_TABLE_DOCUMENTS, array (
+         'type' => $type,
+         'author' => $author,
+         'file_name' => $target_name,
+         'title' => $title,
+         'description' => $description,
+         'date_updated' => current_time ('mysql', 1)
+      ))) {
+         unlink ($target_path . '/' . $target_name);
+         return false;
+      }
+
+      // return
+      $this->updated_document_title = $title;
+      return true;
+
+   }
+
+   public function update_document ($document_id, $title, $description, $type, $author, $file_reference) {
+      // file reference in format of: Array ( [name] => Capture.PNG [type] => image/png [tmp_name] => /tmp/phpeWcPTP [error] => 0 [size] => 18462 )
+
+      // validate required fields
+      if (!$document_id || !$title || !$description || !$type || !$author) {
+         $this->error_message = 'Missing required fields. Please try again.';
+         return false;
+      }
+
+      // load the current document fields
+      $document_data = $this->get_document ($document_id);
+      if (!$document_data) return false;
+
+      // if file provided, validate that it is not associated to a different document, and rename it if it does
+      $target_path = $target_name = '';
+      if ($file_reference && $file_reference['size']) {
+         $target_path = DDS_UPLOAD_BASE_PATH . '/' . $type;
+         $target_name = $file_reference['name'];
+         $i = 1;
+         while (file_exists ($target_path . '/' . $target_name)) {
+            if ($target_name == $document_data->file_name) break;
+            if (strpos ($target_name, '(' . ($i - 1) . ')') !== false) $target_name = str_replace ('(' . ($i - 1) . ')', '(' . $i . ')', $target_name);
+            else $target_name = str_replace ('.', '(' . $i . ').', $target_name);
+            if ($i > 100) { // break out if excessive looping
+               $this->error_message = 'The file name is already in use. Please change the file name and try again.';
+               return false;
+            }
+            $i++;
+         }
+      }
+
+      // move the file to the uploads folder
+      if ($target_name) {
+         if (!move_uploaded_file($file_reference['tmp_name'], $target_path . '/' . $target_name)) return false;
+      }
+
+      // update the record
+      if (! $this->db->update (DDS_TABLE_DOCUMENTS,
+         array (
+            'type' => $type,
+            'author' => $author,
+            'file_name' => $target_name,
+            'title' => $title,
+            'description' => $description,
+            'date_updated' => current_time ('mysql', 1)),
+         array (
+            'id' => $document_id)
+      )) {
+         if ($target_name != $document_data->file_name) // remove file only if new and not overwrite
+            unlink ($target_path . '/' . $target_name);
+         return false;
+      }
+
+      // delete the original file the file name is different from provided
+      if ($target_name && $document_data->file_name != $target_name) {
+         unlink ($target_path . '/' . $document_data->file_name);
+      }
+
+      // return
+      $this->updated_document_title = $document_data->title; // set the old title for the status message because that's what was being updated
+      return true;
+
+   }
+
    public function delete_document ($document_id) {
 
       // load the document
       $document_data = $this->get_document ($document_id);
-      if (! $document_data) return false;
+      if (!$document_data) return false;
       $this->updated_document_title = $document_data->title; // set title so is accessible for status messages
 
       // delete the file from the file system
@@ -91,13 +201,6 @@ class dds_document_manager {
 
       // delete the record from the database
       if (! $this->db->delete (DDS_TABLE_DOCUMENTS, array ('id' => $document_id), array ('%d'))) return false;
-
-      /*
-      $sql = $this->db->prepare ('
-         DELETE FROM ' . DDS_TABLE_DOCUMENTS . '
-         WHERE       id = %d',
-         $document_id);
-      */
 
       return true;
 
