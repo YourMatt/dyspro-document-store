@@ -115,6 +115,11 @@ class dds_document_manager {
          $i++;
       }
 
+      // create the target folder if doesn't already exist
+      if (!file_exists ($target_path)) {
+         if (!mkdir($target_path)) return false;
+      }
+
       // move the file to the uploads folder
       if (!move_uploaded_file ($file_reference['tmp_name'], $target_path . '/' . $target_name)) return false;
 
