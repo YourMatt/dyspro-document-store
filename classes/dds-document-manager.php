@@ -14,7 +14,6 @@ class dds_document_manager {
    public function get_documents ($type, $sort_field = 'title', $sort_direction = 'asc') {
 
       // load the data from the database
-      // TODO: Pull author name
       $sql = $this->db->prepare ('
          SELECT   id
          ,        type
@@ -177,6 +176,7 @@ class dds_document_manager {
       if ($target_name) {
          if (!move_uploaded_file($file_reference['tmp_name'], $target_path . '/' . $target_name)) return false;
       }
+      else $target_name = $document_data->file_name;
 
       // update the record
       if (! $this->db->update (DDS_TABLE_DOCUMENTS,
